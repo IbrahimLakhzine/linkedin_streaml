@@ -9,11 +9,22 @@ import json
 import time
 import io
 from PIL import Image, ImageDraw, ImageFont
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # --- CONFIGURATION ---
-GEMINI_API_KEY = 'AIzaSyCT7Kkc5Sd10Egf5k8Cc3eyaz4T5N0IKlk'
-LINKEDIN_ACCESS_TOKEN = 'AQX0gupmnGNhmo3sVfBYcg66DuJf7-dKOcIzgY0qUOzrDpxIY6euoD_cakjh9gBUD9dc3PfaIaaxPWajDrlpRSOSz4csDCxqud0gztszYr-8RdAL8_4LTYuzQkkKu8Eog-um40iWVo_a-_hHLOO4FpffOGd1NEPKtc0AYG0VAQM0OTgO2yfW5z9RbOyqmSbSZlts8hSowzAC-ndOLxhBt9iGm3Lvkq-1jNSD2bN50eEXYadieJZpMgIUa1Ok6aRAhywj4C6yq4zOoTTRrwehQcpxOn8drl8nC97WowfmKG3gHNgy8OkL1mM3j1f1vtBeQTMlz2UYvEKYjRXg67jWXQUz4_G1Lg'
-LINKEDIN_AUTHOR_URN = 'urn:li:person:fUeHya-Bcp'
+# Function to get secret from st.secrets if available, else os.getenv
+def get_secret(key, default=None):
+    if key in st.secrets:
+        return st.secrets[key]
+    return os.getenv(key, default)
+
+GEMINI_API_KEY = get_secret('GEMINI_API_KEY')
+LINKEDIN_ACCESS_TOKEN = get_secret('LINKEDIN_ACCESS_TOKEN')
+LINKEDIN_AUTHOR_URN = get_secret('LINKEDIN_AUTHOR_URN')
 
 genai.configure(api_key=GEMINI_API_KEY)
 

@@ -3,6 +3,11 @@ from bs4 import BeautifulSoup
 import re
 import google.generativeai as genai
 import pandas as pd
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 import time
 import random
 import json
@@ -10,9 +15,9 @@ from datetime import datetime, timedelta
 import os
 
 # --- CONFIGURATION ---
-GEMINI_API_KEY = 'AIzaSyB961o81sr_ZYe7TDdzYoSpbiZnmnc2Tx0'
-LINKEDIN_ACCESS_TOKEN = 'AQX0gupmnGNhmo3sVfBYcg66DuJf7-dKOcIzgY0qUOzrDpxIY6euoD_cakjh9gBUD9dc3PfaIaaxPWajDrlpRSOSz4csDCxqud0gztszYr-8RdAL8_4LTYuzQkkKu8Eog-um40iWVo_a-_hHLOO4FpffOGd1NEPKtc0AYG0VAQM0OTgO2yfW5z9RbOyqmSbSZlts8hSowzAC-ndOLxhBt9iGm3Lvkq-1jNSD2bN50eEXYadieJZpMgIUa1Ok6aRAhywj4C6yq4zOoTTRrwehQcpxOn8drl8nC97WowfmKG3gHNgy8OkL1mM3j1f1vtBeQTMlz2UYvEKYjRXg67jWXQUz4_G1Lg'
-LINKEDIN_AUTHOR_URN = 'urn:li:person:fUeHya-Bcp'  # Your Person ID
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+LINKEDIN_ACCESS_TOKEN = os.getenv('LINKEDIN_ACCESS_TOKEN')
+LINKEDIN_AUTHOR_URN = os.getenv('LINKEDIN_AUTHOR_URN')
 
 genai.configure(api_key=GEMINI_API_KEY)
 

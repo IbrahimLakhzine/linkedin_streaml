@@ -1,14 +1,18 @@
 from requests_oauthlib import OAuth2Session
 import webbrowser
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Disable scope change errors
-os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
+os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = os.getenv('OAUTHLIB_RELAX_TOKEN_SCOPE', '1')
 
 # Client keys
-CLIENT_ID = '78pz3yi7wreoza'
-CLIENT_SECRET = 'WPL_AP1.TNKBz3giqsCwTbT6.TXgD+w=='
-REDIRECT_URI = 'https://www.linkedin.com/in/ibrahim-lakhzine-9739a112b/'
+CLIENT_ID = os.getenv('LINKEDIN_CLIENT_ID')
+CLIENT_SECRET = os.getenv('LINKEDIN_CLIENT_SECRET')
+REDIRECT_URI = os.getenv('LINKEDIN_REDIRECT_URI')
 
 # Authorization URL
 AUTHORIZATION_BASE_URL = 'https://www.linkedin.com/oauth/v2/authorization'

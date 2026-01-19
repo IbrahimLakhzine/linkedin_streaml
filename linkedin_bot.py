@@ -5,13 +5,19 @@ from datetime import datetime
 from requests_oauthlib import OAuth2Session
 import google.generativeai as genai
 import pandas as pd
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Constants
-GEMINI_API_KEY = 'AIzaSyB961o81sr_ZYe7TDdzYoSpbiZnmnc2Tx0'  # Replace with your valid Gemini API key
-LINKEDIN_CLIENT_ID = '78pz3yi7wreoza'
-LINKEDIN_CLIENT_SECRET = 'WPL_AP1.TNKBz3giqsCwTbT6.TXgD+w=='
-LINKEDIN_REDIRECT_URI = 'https://www.linkedin.com/in/ibrahim-lakhzine-9739a112b/'
-LINKEDIN_ACCESS_TOKEN = 'AQX0gupmnGNhmo3sVfBYcg66DuJf7-dKOcIzgY0qUOzrDpxIY6euoD_cakjh9gBUD9dc3PfaIaaxPWajDrlpRSOSz4csDCxqud0gztszYr-8RdAL8_4LTYuzQkkKu8Eog-um40iWVo_a-_hHLOO4FpffOGd1NEPKtc0AYG0VAQM0OTgO2yfW5z9RbOyqmSbSZlts8hSowzAC-ndOLxhBt9iGm3Lvkq-1jNSD2bN50eEXYadieJZpMgIUa1Ok6aRAhywj4C6yq4zOoTTRrwehQcpxOn8drl8nC97WowfmKG3gHNgy8OkL1mM3j1f1vtBeQTMlz2UYvEKYjRXg67jWXQUz4_G1Lg'  # Obtain this through the OAuth flow
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+LINKEDIN_CLIENT_ID = os.getenv('LINKEDIN_CLIENT_ID')
+LINKEDIN_CLIENT_SECRET = os.getenv('LINKEDIN_CLIENT_SECRET')
+LINKEDIN_REDIRECT_URI = os.getenv('LINKEDIN_REDIRECT_URI')
+LINKEDIN_ACCESS_TOKEN = os.getenv('LINKEDIN_ACCESS_TOKEN')
+LINKEDIN_AUTHOR_URN = os.getenv('LINKEDIN_AUTHOR_URN')
 
 genai.configure(api_key=GEMINI_API_KEY)
 
@@ -127,7 +133,7 @@ def post_to_linkedin(content, access_token):
         'X-Restli-Protocol-Version': '2.0.0'
     }
     post_data = {
-        "author": "urn:li:person:fUeHya-Bcp",
+        "author": LINKEDIN_AUTHOR_URN,
         "lifecycleState": "PUBLISHED",
         "specificContent": {
             "com.linkedin.ugc.ShareContent": {
