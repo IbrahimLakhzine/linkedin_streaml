@@ -25,8 +25,13 @@ st.set_page_config(
 
 # --- CONFIGURATION ---
 def get_secret(key, default=None):
-    if key in st.secrets:
-        return st.secrets[key]
+    try:
+        # st.secrets behaves like a dict but can raise an error if no secrets file exists at all
+        if key in st.secrets:
+            return st.secrets[key]
+    except Exception:
+        # Fallback if secrets are not configured or st.secrets raises an error
+        pass
     return os.getenv(key, default)
 
 # Initial load from env/secrets
