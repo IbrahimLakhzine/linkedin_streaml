@@ -15,6 +15,14 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+# --- SETUP PAGE ---
+st.set_page_config(
+    page_title="LinkedIn Genius",
+    page_icon="🕴️",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
 # --- CONFIGURATION ---
 def get_secret(key, default=None):
     if key in st.secrets:
@@ -26,30 +34,23 @@ LINKEDIN_ACCESS_TOKEN = get_secret('LINKEDIN_ACCESS_TOKEN')
 LINKEDIN_AUTHOR_URN = get_secret('LINKEDIN_AUTHOR_URN')
 
 # --- UI SETTINGS (SIDEBAR) ---
-st.sidebar.markdown("## ⚙️ Settings")
-ui_api_key = st.sidebar.text_input(
-    "Gemini API Key", 
-    value=get_secret('GEMINI_API_KEY', ""),
-    type="password",
-    help="Enter your Gemini API key here. It will override the default key if provided."
-)
+with st.sidebar:
+    st.markdown("## ⚙️ Settings")
+    ui_api_key = st.text_input(
+        "Gemini API Key", 
+        value=get_secret('GEMINI_API_KEY', ""),
+        type="password",
+        help="Enter your Gemini API key here. It will override the default key if provided."
+    )
 
-# Use UI key if provided, else fallback to secrets
-GEMINI_API_KEY = ui_api_key if ui_api_key else get_secret('GEMINI_API_KEY')
+    # Use UI key if provided, else fallback to secrets
+    GEMINI_API_KEY = ui_api_key if ui_api_key else get_secret('GEMINI_API_KEY')
 
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-else:
-    st.sidebar.warning("⚠️ Gemini API Key is missing. Please enter it above or add it to your secrets.")
+    if GEMINI_API_KEY:
+        genai.configure(api_key=GEMINI_API_KEY)
+    else:
+        st.warning("⚠️ Gemini API Key is missing. Please enter it above or add it to your secrets.")
 
-
-# --- SETUP PAGE ---
-st.set_page_config(
-    page_title="LinkedIn Genius",
-    page_icon="🕴️",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
 
 # --- UTILS ---
 
