@@ -11,8 +11,10 @@
 !requirements.txt
 !.gitignore
 
-# Safety: Never include sensitive files
+# Safety: Never include sensitive files or cache
 .env
+__pycache__/
+*.py[cod]
 processed_urls.csv
 topic_history.json
 *.png
@@ -20,3 +22,4 @@ topic_history.json
 *.jpeg
 *.jfif
 *.gif
+
