@@ -16,17 +16,32 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # --- CONFIGURATION ---
-# Function to get secret from st.secrets if available, else os.getenv
 def get_secret(key, default=None):
     if key in st.secrets:
         return st.secrets[key]
     return os.getenv(key, default)
 
-GEMINI_API_KEY = get_secret('GEMINI_API_KEY')
+# Initial load from env/secrets
 LINKEDIN_ACCESS_TOKEN = get_secret('LINKEDIN_ACCESS_TOKEN')
 LINKEDIN_AUTHOR_URN = get_secret('LINKEDIN_AUTHOR_URN')
 
-genai.configure(api_key=GEMINI_API_KEY)
+# --- UI SETTINGS (SIDEBAR) ---
+st.sidebar.markdown("## ⚙️ Settings")
+ui_api_key = st.sidebar.text_input(
+    "Gemini API Key", 
+    value=get_secret('GEMINI_API_KEY', ""),
+    type="password",
+    help="Enter your Gemini API key here. It will override the default key if provided."
+)
+
+# Use UI key if provided, else fallback to secrets
+GEMINI_API_KEY = ui_api_key if ui_api_key else get_secret('GEMINI_API_KEY')
+
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+else:
+    st.sidebar.warning("⚠️ Gemini API Key is missing. Please enter it above or add it to your secrets.")
+
 
 # --- SETUP PAGE ---
 st.set_page_config(
