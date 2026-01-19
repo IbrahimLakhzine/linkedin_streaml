@@ -470,9 +470,13 @@ def create_quiz_image_pillow(quiz_data, category):
         y = y_pos + i * 42
         
         # Draw colored circle with letter
-        draw.ellipse([30, y, 58, y + 28], fill=color)
+        circle_x, circle_y = 30, y
+        circle_size = 30
+        draw.ellipse([circle_x, circle_y, circle_x + circle_size, circle_y + circle_size], fill=color)
+        
         letter = chr(65 + i)
-        draw.text((39, y + 3), letter, fill=(0, 0, 0), font=option_font)
+        # Center text in circle using anchor='mm'
+        draw.text((circle_x + circle_size/2, circle_y + circle_size/2), letter, fill=(0, 0, 0), font=option_font, anchor="mm")
         
         # Get option text (remove prefix if present)
         opt_text = opt[3:] if len(opt) > 2 and opt[1] == ')' else opt
@@ -482,7 +486,7 @@ def create_quiz_image_pillow(quiz_data, category):
         if len(opt_text) > max_chars:
             opt_text = opt_text[:max_chars-3] + "..."
         
-        draw.text((70, y + 5), opt_text, fill=text_color, font=option_font)
+        draw.text((circle_x + circle_size + 15, circle_y + 5), opt_text, fill=text_color, font=option_font)
     
     # Convert to bytes
     img_byte_arr = io.BytesIO()
