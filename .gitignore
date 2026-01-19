@@ -1,6 +1,22 @@
+# Ignore all files by default
+*
+
+# Allow directories
+!*/
+
+# Only allow files starting with "linkedin"
+!linkedin*
+
+# Allow necessary deployment and git configuration files
+!requirements.txt
+!.gitignore
+
+# Safety: Never include sensitive files
 .env
-__pycache__/
-*.csv
-*.json
+processed_urls.csv
+topic_history.json
 *.png
-!quiz_template.png
+*.jpg
+*.jpeg
+*.jfif
+*.gif
