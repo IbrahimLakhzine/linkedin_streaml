@@ -493,8 +493,13 @@ def create_quiz_image_pillow(quiz_data, category):
     img.save(img_byte_arr, format='PNG')
     return img_byte_arr.getvalue(), img
 
-def show_post_preview(post_text, image=None, image_bytes=None):
-    """Display a LinkedIn-style preview of the post."""
+def show_post_preview(image=None, image_bytes=None):
+    """Display a LinkedIn-style preview of the post.
+    Edits are automatically saved to st.session_state['generated_post']
+    """
+    if 'generated_post' not in st.session_state:
+        return
+
     st.markdown("---")
     st.markdown("### 📱 Post Preview")
     
@@ -512,14 +517,12 @@ def show_post_preview(post_text, image=None, image_bytes=None):
         elif image_bytes is not None:
             st.image(image_bytes, use_container_width=True)
         
-        # Show post text
+        # Show post text - Edits sync directly with st.session_state['generated_post']
         st.markdown(f"**📝 Edit your post text:**")
-        # Any edits in this text area will update st.session_state['generated_post']
-        st.session_state['generated_post'] = st.text_area(
+        st.text_area(
             "Post Content", 
-            value=post_text, 
+            key="generated_post", # Direct binding to the state
             height=350, 
-            key="post_editor_main", 
             label_visibility="collapsed"
         )
         
@@ -562,7 +565,9 @@ if option == "🚀 Auto Trend Hunter":
                 st.session_state['article_url'] = article['url']
     
     if 'generated_post' in st.session_state and st.session_state.get('post_type') == 'text':
-        show_post_preview(st.session_state['generated_post'])
+        # Ensure it's a string if we are using it as a key for text_area
+        st.session_state['generated_post'] = str(st.session_state['generated_post'])
+        show_post_preview()
         
         if st.button("🚀 Publish to LinkedIn"):
             if post_to_linkedin_api(st.session_state['generated_post']):
@@ -598,7 +603,8 @@ elif option == "🔍 Manual Topic Scout":
             st.error("Please enter a subject first.")
     
     if 'generated_post' in st.session_state and st.session_state.get('post_type') == 'manual':
-        show_post_preview(st.session_state['generated_post'])
+        st.session_state['generated_post'] = str(st.session_state['generated_post'])
+        show_post_preview()
         
         if st.button("🚀 Publish to LinkedIn"):
             if post_to_linkedin_api(st.session_state['generated_post']):
@@ -637,7 +643,8 @@ elif option == "👁️ Visual Storyteller":
                 st.session_state['image_data'] = img_byte_arr.getvalue()
 
     if 'generated_post' in st.session_state and st.session_state.get('post_type') == 'image':
-        show_post_preview(st.session_state['generated_post'], image=st.session_state.get('preview_image'))
+        st.session_state['generated_post'] = str(st.session_state['generated_post'])
+        show_post_preview(image=st.session_state.get('preview_image'))
         
         if st.button("🚀 Publish (Image + Text)"):
             with st.spinner("Uploading..."):
@@ -675,7 +682,8 @@ elif option == "✨ Creative Remix":
                 st.session_state['image_data'] = img_byte_arr.getvalue()
 
     if 'generated_post' in st.session_state and st.session_state.get('post_type') == 'remix':
-        show_post_preview(st.session_state['generated_post'], image=st.session_state.get('preview_image'))
+        st.session_state['generated_post'] = str(st.session_state['generated_post'])
+        show_post_preview(image=st.session_state.get('preview_image'))
         
         if st.button("🚀 Publish Remix"):
             asset_urn = upload_image_to_linkedin(st.session_state['image_data'])
@@ -713,18 +721,8 @@ elif option == "🧠 Quiz Challenge":
                 st.session_state['post_type'] = 'quiz'
     
     if 'generated_post' in st.session_state and st.session_state.get('post_type') == 'quiz':
-        # Show quiz details
-        quiz = st.session_state.get('quiz_data', {})
-        st.markdown(f"**Question:** {quiz.get('question', '')}")
-        if quiz.get('code'):
-            st.code(quiz.get('code'), language='python')
-        st.markdown(f"**Correct Answer:** {quiz.get('answer', 'N/A')}")
-        
-        # Show preview
-        show_post_preview(
-            st.session_state['generated_post'], 
-            image=st.session_state.get('quiz_image')
-        )
+        st.session_state['generated_post'] = str(st.session_state['generated_post'])
+        show_post_preview(image=st.session_state.get('quiz_image'))
         
         if st.button("🚀 Publish Quiz"):
             with st.spinner("Publishing..."):
