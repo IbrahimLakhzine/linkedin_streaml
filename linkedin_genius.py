@@ -575,8 +575,12 @@ def show_post_preview(image=None, image_bytes=None):
             if st.button("Change", type="primary", use_container_width=True):
                 if instructions:
                     with st.spinner("AI is rewriting your post..."):
-                        refined_text = refine_post_with_ai(st.session_state['generated_post'], instructions)
+                        current_text = st.session_state.get('generated_post', "")
+                        refined_text = refine_post_with_ai(current_text, instructions)
+                        
+                        # Update BOTH states to ensure the UI refreshes correctly
                         st.session_state['generated_post'] = refined_text
+                        st.session_state['post_editor_internal'] = refined_text
                         st.rerun()
                 else:
                     st.warning("Please enter an instruction first.")
