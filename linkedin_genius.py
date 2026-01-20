@@ -512,10 +512,10 @@ def show_post_preview(image=None, image_bytes=None):
             st.caption("Just now · 🌐")
         
         # Show image if exists
-        if image is not None:
-            st.image(image, use_container_width=True)
-        elif image_bytes is not None:
+        if image_bytes is not None:
             st.image(image_bytes, use_container_width=True)
+        elif image is not None:
+            st.image(image, use_container_width=True)
         
         # Show post text - Edits sync directly with st.session_state['generated_post']
         st.markdown(f"**📝 Edit your post text:**")
@@ -636,15 +636,14 @@ elif option == "👁️ Visual Storyteller":
                 
                 st.session_state['generated_post'] = post
                 st.session_state['post_type'] = 'image'
-                st.session_state['preview_image'] = image
-                
-                img_byte_arr = io.BytesIO()
-                image.save(img_byte_arr, format=image.format or 'PNG')
-                st.session_state['image_data'] = img_byte_arr.getvalue()
+                # Use raw bytes for LinkedIn upload to preserve animations (GIFs)
+                st.session_state['image_data'] = uploaded_file.getvalue()
+                # Store for preview
+                st.session_state['preview_image_bytes'] = uploaded_file.getvalue()
 
     if 'generated_post' in st.session_state and st.session_state.get('post_type') == 'image':
         st.session_state['generated_post'] = str(st.session_state['generated_post'])
-        show_post_preview(image=st.session_state.get('preview_image'))
+        show_post_preview(image_bytes=st.session_state.get('preview_image_bytes'))
         
         if st.button("🚀 Publish (Image + Text)"):
             with st.spinner("Uploading..."):
@@ -675,15 +674,14 @@ elif option == "✨ Creative Remix":
                 post = generate_post_text(prompt_description, type="image")
                 st.session_state['generated_post'] = post
                 st.session_state['post_type'] = 'remix'
-                st.session_state['preview_image'] = image
-                
-                img_byte_arr = io.BytesIO()
-                image.save(img_byte_arr, format=image.format or 'PNG')
-                st.session_state['image_data'] = img_byte_arr.getvalue()
+                # Use raw bytes for LinkedIn upload
+                st.session_state['image_data'] = uploaded_file.getvalue()
+                # Store for preview
+                st.session_state['preview_image_bytes'] = uploaded_file.getvalue()
 
     if 'generated_post' in st.session_state and st.session_state.get('post_type') == 'remix':
         st.session_state['generated_post'] = str(st.session_state['generated_post'])
-        show_post_preview(image=st.session_state.get('preview_image'))
+        show_post_preview(image_bytes=st.session_state.get('preview_image_bytes'))
         
         if st.button("🚀 Publish Remix"):
             asset_urn = upload_image_to_linkedin(st.session_state['image_data'])
