@@ -531,6 +531,10 @@ def show_post_preview(image=None, image_bytes=None):
     st.markdown("---")
     st.markdown("### 📱 Post Preview")
     
+    # Initialize versioning for the editor if it doesn't exist
+    if 'editor_version' not in st.session_state:
+        st.session_state['editor_version'] = 0
+    
     # Create a container that looks like LinkedIn
     with st.container():
         col1, col2 = st.columns([1, 3])
@@ -547,14 +551,16 @@ def show_post_preview(image=None, image_bytes=None):
         
         # Show post text - Capture manual edits
         st.markdown(f"**📝 Edit your post text:**")
+        # Use a versioned key to force a widget reset when AI updates the text
+        editor_key = f"post_editor_v{st.session_state['editor_version']}"
         edited_text = st.text_area(
             "Post Content", 
-            value=st.session_state['generated_post'], # Initialize with current state
+            value=st.session_state['generated_post'], 
             height=350, 
-            key="post_editor_internal", # Use internal key to avoid direct binding conflict
+            key=editor_key,
             label_visibility="collapsed"
         )
-        # Update main state with whatever is in the editor (manual edits)
+        # Update main state with whatever is in the current editor
         st.session_state['generated_post'] = edited_text
         
         # Fake engagement bar
@@ -578,12 +584,10 @@ def show_post_preview(image=None, image_bytes=None):
                         current_text = st.session_state.get('generated_post', "")
                         refined_text = refine_post_with_ai(current_text, instructions)
                         
-                        # Update master state
+                        # Update the post content
                         st.session_state['generated_post'] = refined_text
-                        
-                        # DELETE the widget's internal state to force a reset in the next run
-                        if 'post_editor_internal' in st.session_state:
-                            del st.session_state['post_editor_internal']
+                        # Bump the version to force the text_area widget to refresh
+                        st.session_state['editor_version'] += 1
                         st.rerun()
                 else:
                     st.warning("Please enter an instruction first.")
