@@ -213,6 +213,9 @@ def generate_post_text(content, type="article", quiz_data=None):
         - No "Here is a post".
         """
         
+    try:
+        response = model.generate_content(prompt)
+        return response.text
     except Exception as e:
         if "429" in str(e) or "ResourceExhausted" in str(e):
             st.error("🚀 API Quota reached (Rate Limit). Please wait 60 seconds and try again.")
