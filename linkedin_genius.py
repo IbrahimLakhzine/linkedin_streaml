@@ -578,9 +578,12 @@ def show_post_preview(image=None, image_bytes=None):
                         current_text = st.session_state.get('generated_post', "")
                         refined_text = refine_post_with_ai(current_text, instructions)
                         
-                        # Update BOTH states to ensure the UI refreshes correctly
+                        # Update master state
                         st.session_state['generated_post'] = refined_text
-                        st.session_state['post_editor_internal'] = refined_text
+                        
+                        # DELETE the widget's internal state to force a reset in the next run
+                        if 'post_editor_internal' in st.session_state:
+                            del st.session_state['post_editor_internal']
                         st.rerun()
                 else:
                     st.warning("Please enter an instruction first.")
