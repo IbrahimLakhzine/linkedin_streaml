@@ -218,6 +218,31 @@ def generate_post_text(content, type="article", quiz_data=None):
         return response.text
     except: return "Error generating post."
 
+def refine_post_with_ai(current_text, instructions):
+    """Refine the generated post using AI based on user instructions."""
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    prompt = f"""
+    Refine this LinkedIn post based on the following instructions:
+    
+    Current Post:
+    {current_text}
+    
+    Instructions:
+    {instructions}
+    
+    Rules:
+    - Maintain a professional and engaging LinkedIn tone.
+    - Return ONLY the updated post text.
+    - Do not include any explanations, intros, or conversational filler.
+    - Preserve the overall structure (Hook, Rehook, Body, Question, CTA, Hashtags).
+    """
+    try:
+        response = model.generate_content(prompt)
+        return response.text.strip()
+    except Exception as e:
+        st.error(f"Refinement failed: {e}")
+        return current_text
+
 def upload_image_to_linkedin(image_bytes, mime_type="image/jpeg"):
     register_url = "https://api.linkedin.com/v2/assets?action=registerUpload"
     headers = {
@@ -528,6 +553,28 @@ def show_post_preview(image=None, image_bytes=None):
         
         # Fake engagement bar
         st.markdown("👍 💬 🔄 📤")
+    
+    # AI Refinement Section
+    st.markdown("### ✨ AI Refinement")
+    with st.expander("🪄 Ask AI to rewrite or adjust this post", expanded=False):
+        refine_col1, refine_col2 = st.columns([4, 1])
+        with refine_col1:
+            instructions = st.text_input(
+                "Comment/Instruction for AI", 
+                placeholder="e.g. 'Make it more professional', 'Add 3 more emojis', 'Translate to French'",
+                key="ai_refine_input"
+            )
+        with refine_col2:
+            st.write("") # Padding
+            if st.button("Change", type="primary", use_container_width=True):
+                if instructions:
+                    with st.spinner("AI is rewriting your post..."):
+                        refined_text = refine_post_with_ai(st.session_state['generated_post'], instructions)
+                        st.session_state['generated_post'] = refined_text
+                        st.rerun()
+                else:
+                    st.warning("Please enter an instruction first.")
+
     st.markdown("---")
 
 # --- MAIN APP ---
@@ -621,7 +668,7 @@ elif option == "👁️ Visual Storyteller":
     st.header("Mode 2: Visual Storyteller")
     st.info("Upload an image. AI analyzes it and writes a post.")
     
-    uploaded_file = st.file_uploader("Upload Image", type=['jpg', 'png', 'jpeg', 'jfif', 'JFIF', 'gif', 'GIF'])
+    uploaded_file = st.file_uploader("Upload Image", type=['jpg', 'png', 'jpeg', 'JFIF', 'GIF'])
     
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
@@ -659,7 +706,7 @@ elif option == "✨ Creative Remix":
     st.header("Mode 3: Creative Remix")
     st.info("Upload an image. AI analyzes and writes a creative post about it.")
     
-    uploaded_file = st.file_uploader("Upload Source Image", type=['jpg', 'png', 'jpeg', 'jfif', 'JFIF', 'gif', 'GIF'])
+    uploaded_file = st.file_uploader("Upload Source Image", type=['jpg', 'png', 'jpeg', 'JFIF', 'GIF'])
     
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
