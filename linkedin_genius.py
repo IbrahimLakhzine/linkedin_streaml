@@ -545,14 +545,17 @@ def show_post_preview(image=None, image_bytes=None):
         elif image is not None:
             st.image(image, use_container_width=True)
         
-        # Show post text - Edits sync directly with st.session_state['generated_post']
+        # Show post text - Capture manual edits
         st.markdown(f"**📝 Edit your post text:**")
-        st.text_area(
+        edited_text = st.text_area(
             "Post Content", 
-            key="generated_post", # Direct binding to the state
+            value=st.session_state['generated_post'], # Initialize with current state
             height=350, 
+            key="post_editor_internal", # Use internal key to avoid direct binding conflict
             label_visibility="collapsed"
         )
+        # Update main state with whatever is in the editor (manual edits)
+        st.session_state['generated_post'] = edited_text
         
         # Fake engagement bar
         st.markdown("👍 💬 🔄 📤")
