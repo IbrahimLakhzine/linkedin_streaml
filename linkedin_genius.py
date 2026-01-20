@@ -60,7 +60,7 @@ with st.sidebar:
 # --- UTILS ---
 
 def get_trending_tech_topic():
-    model = genai.GenerativeModel("gemini-2.5-flash")
+    model = genai.GenerativeModel("gemini-1.5-flash")
     prompt = f"""
     Give me one trending technical specific search term for Google News related to AI, Tech, or Finance for today ({datetime.now().strftime('%Y-%m-%d')}). 
     Output ONLY the search term. No quotes.
@@ -162,7 +162,7 @@ def fetch_article_content(topic):
     return None
 
 def generate_post_text(content, type="article", quiz_data=None):
-    model = genai.GenerativeModel("gemini-2.5-flash")
+    model = genai.GenerativeModel("gemini-1.5-flash")
     prompt = ""
     
     if type == "article":
@@ -213,10 +213,10 @@ def generate_post_text(content, type="article", quiz_data=None):
         - No "Here is a post".
         """
         
-    try:
-        response = model.generate_content(prompt)
-        return response.text
-    except: return "Error generating post."
+    except Exception as e:
+        if "429" in str(e) or "ResourceExhausted" in str(e):
+            st.error("🚀 API Quota reached (Rate Limit). Please wait 60 seconds and try again.")
+        return f"Error generating post: {e}"
 
 def refine_post_with_ai(current_text, instructions):
     """Refine the generated post using AI based on user instructions."""
@@ -316,7 +316,7 @@ def post_to_linkedin_api(text, asset_urn=None):
 
 def generate_quiz_question(category):
     """Generate a quiz question with 4 options using Gemini."""
-    model = genai.GenerativeModel("gemini-2.5-flash")
+    model = genai.GenerativeModel("gemini-1.5-flash")
     
     prompt = f"""
     Create a challenging but fair multiple-choice quiz question for {category}.
@@ -401,7 +401,7 @@ def create_quiz_image(quiz_data, category):
         
         # Generate image using the template as reference
         response = client.models.generate_content(
-            model="gemini-2.5-flash-image",
+            model="gemini-1.5-flash",
             contents=[prompt, template_image],
         )
         
@@ -675,7 +675,7 @@ elif option == "👁️ Visual Storyteller":
         
         if st.button("Analyze & Write"):
             with st.spinner("Analyzing image..."):
-                model = genai.GenerativeModel('gemini-2.5-flash')
+                model = genai.GenerativeModel("gemini-1.5-flash")
                 response = model.generate_content(["Describe this image in detail for a professional audience.", image])
                 description = response.text
                 
@@ -714,7 +714,7 @@ elif option == "✨ Creative Remix":
         
         if st.button("Remix & Generate"):
             with st.spinner("Analyzing and creating post..."):
-                vision_model = genai.GenerativeModel('gemini-2.5-flash')
+                vision_model = genai.GenerativeModel("gemini-1.5-flash")
                 desc_response = vision_model.generate_content(["Describe the visual composition, subject, and mood of this image.", image])
                 prompt_description = desc_response.text
                 
