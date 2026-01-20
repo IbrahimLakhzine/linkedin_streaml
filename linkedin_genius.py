@@ -513,8 +513,15 @@ def show_post_preview(post_text, image=None, image_bytes=None):
             st.image(image_bytes, use_container_width=True)
         
         # Show post text
-        st.markdown(f"**Post Text:**")
-        st.text_area("Post Content", post_text, height=200, disabled=True, key="preview_text", label_visibility="collapsed")
+        st.markdown(f"**📝 Edit your post text:**")
+        # Any edits in this text area will update st.session_state['generated_post']
+        st.session_state['generated_post'] = st.text_area(
+            "Post Content", 
+            value=post_text, 
+            height=350, 
+            key="post_editor_main", 
+            label_visibility="collapsed"
+        )
         
         # Fake engagement bar
         st.markdown("👍 💬 🔄 📤")
