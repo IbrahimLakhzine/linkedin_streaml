@@ -10,6 +10,8 @@
 # Allow necessary deployment and git configuration files
 !requirements.txt
 !.gitignore
+!quiz_template.png
+
 
 # Safety: Never include sensitive files or cache
 .env
